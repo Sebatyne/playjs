@@ -1,0 +1,100 @@
+html, body {
+  height: 100%;
+}
+
+label {
+  color: #777;
+}
+
+fieldset {
+ border-style: none;
+}
+
+button img {
+  pointer-events: none;
+}
+
+#main {
+  display: flex;
+  flex-flow: row;
+  height: 100%;
+}
+
+#page-menu {
+  flex: 1 6 20%;
+  overflow: auto;
+  padding-left: 1em;
+}
+
+#page-form {
+  overflow: auto;
+  flex-direction: column;
+}
+
+#page-form-head {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+#global-option-menu {
+  position: absolute;
+  z-index: 10;
+  padding: 10px;
+  top: 0px;
+  background: white;
+  border-color: black;
+  border-style: solid;
+  border-width: 1px;
+  display: none;
+}
+
+.main-form-visible {
+  display: flex;
+  flex: 3 1 80%;
+}
+
+.main-form-hidden {
+ display: none;
+}
+
+.pure-menu {
+  margin-bottom: 1.3em;
+}
+
+.pure-menu-horizontal .pure-menu-list {
+  display: flex;
+  flex: 1;
+  justify-content: space-around;
+}
+
+.view-global-option {
+  display: none;
+}
+
+.editor-view-choice-list {
+  display: flex;
+  margin-bottom: 1em;
+  text-align: center;
+  cursor: pointer;
+}
+
+.editor-view-choice {
+  flex: 1;
+}
+
+.notification-gadget {
+  background-color: inherit;
+  padding: 0;
+}
+
+.CodeMirror {
+  flex-grow: 1;
+}
+
+
+@media all and (max-width: 640px) {
+  #main {
+    flex-direction: column;
+  }
+}
