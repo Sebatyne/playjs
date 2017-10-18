@@ -19,7 +19,13 @@ function isOfflineMode() {
   return self.jIO.createJIO({
     type: 'indexeddb',
     database: 'settings'
-  }).get('offline');
+  }).get('offline')
+  .push(function (offline) {
+    return offline;
+  }, function (error) {
+    // If offline parameter doesn't exist, don't serve from cache
+    return false;
+  });
 }
 
 function splitDocumentAndAttachmentId(path) {
