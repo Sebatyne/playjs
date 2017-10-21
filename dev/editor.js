@@ -47,24 +47,7 @@
     .declareMethod("render", function () {
       var gadget = this;
 
-      var editor = CodeMirror.fromTextArea(document.getElementById('page-form-editor'), {
-        lineNumbers: true,
-        mode: 'text/html',
-        autoCloseTags: true,
-        matchBrackets: true,
-        autoCloseBrackets: true,
-        showTrailingSpace: true,
-        keyMap: "vim",
-        //theme: 'solarized dark',
-        extraKeys: {
-          "Alt-Space": "autocomplete",
-          "F11": function(cm) {
-            cm.setOption("fullScreen", !cm.getOption("fullScreen"));
-          }
-        }
-      });
-
-      gadget.editor = editor;
+      gadget.buffer_dict = {};
 
       var username_input = gadget.element.querySelector("[name=\"username\"]"),
           password_input = gadget.element.querySelector("[name=\"password\"]"),
@@ -115,26 +98,85 @@
     })
 
     .declareMethod("openResourceFromPath", function (pathname) {
-      var gadget = this;
-      return gadget.getDeclaredGadget("storage")
+      var gadget = this,
+          scopename = pathname + "_editor",
+          pathname_input = gadget.element.querySelector("input[name=\"pathname\"]"),
+          content_type_input = gadget.element.querySelector("input[name=\"content-type\"]"),
+          queue = RSVP.Queue();
+
+      // If gadget is the same, do nothing
+      if (gadget.current_editor_scope === scopename) {
+        return queue;
+      }
+
+      pathname_input.value = pathname;
+
+      // Hide previous buffer
+      if (gadget.current_editor_scope !== undefined) {
+        queue.push(function () {
+          return gadget.getDeclaredGadget(gadget.current_editor_scope);
+        })
+        .push(function (current_gadget) {
+          current_gadget.element.style.display = "none";
+          return RSVP.Queue();
+        });
+      }
+
+      // If file has already been opened, display the buffer
+      if (scopename in gadget.buffer_dict) {
+        queue.push(function () {
+          return gadget.getDeclaredGadget(scopename);;
+        })
+        .push(function (new_gadget) {
+          new_gadget.element.style.display = "flex";
+          gadget.current_editor_scope = scopename;
+          return new_gadget.getContentType();
+        })
+        .push(function (content_type) {
+          content_type_input.value = content_type;
+          return RSVP.Queue();
+        })
+      }
+      // Otherwise create a new buffer containing the file
+      else {
+        queue.push(function () {
+            return gadget.getDeclaredGadget("storage");
+          })
           .push(function (storage_gadget) {
               return storage_gadget.getAttachment(pathname);
           })
           .push(function (blob) {
-              var pathname_input = gadget.element.querySelector("input[name=\"pathname\"]");
-              var content_type_input = gadget.element.querySelector("input[name=\"content-type\"]");
-
-              pathname_input.value= pathname;
               content_type_input.value = blob.type;
-              gadget.editor.setOption('mode', blob.type);
 
               var fr = new FileReader();
+
               fr.onloadend = function (res) {
-                  gadget.editor.setValue(res.target.result);
+                var gadget_element = window.document.createElement("div");
+                gadget_element.setAttribute("name", scopename);
+                gadget_element.classList.add("editor-buffer");
+                gadget.element.querySelector(".editor-container").appendChild(gadget_element);
+
+                gadget.declareGadget("gadget_text_editor.html", {
+                  "scope": scopename,
+                  "sandbox": "public",
+                  "element": gadget_element,
+                })
+                  .push(function (gadget_editor) {
+                    gadget.current_editor_scope = scopename;
+                    gadget.buffer_dict[scopename] = gadget_editor;
+                    gadget_editor.render(pathname, res.target.result, blob.type)
+
+                    return RSVP.Queue();
+                  })
               }
+
               fr.readAsText(blob);
+
               return RSVP.Queue();
           });
+      }
+
+      return queue;
     })
 
     .declareService(function () {
@@ -180,12 +222,24 @@
         else if (event.target.getAttribute('name') == "short-action-save") {
           event.preventDefault();
           var content_type = gadget.element.querySelector("input[name=\"content-type\"]").value,
-              pathname = gadget.element.querySelector("input[name=\"pathname\"]").value,
-              blob = new Blob([gadget.editor.getValue()], {type: content_type});
+              pathname = gadget.element.querySelector("input[name=\"pathname\"]").value;
 
-          return gadget.getDeclaredGadget("storage")
-            .push(function (storage_gadget) {
-            return storage_gadget.putAttachment(pathname, blob);
+          return RSVP.Queue()
+            .push(function () {
+               return RSVP.all([
+                 gadget.getDeclaredGadget(gadget.current_editor_scope),
+                 gadget.getDeclaredGadget("storage")
+                 ]);
+            })
+            .push(function (gadget_list) {
+              var editor_gadget = gadget_list[0],
+                  storage_gadget = gadget_list[1];
+
+              return editor_gadget.getValue()
+                .push(function (editor_content) {
+                  var blob = new Blob([editor_content], {type: content_type});
+                  return storage_gadget.putAttachment(pathname, blob);
+              });
           });
         }
         else if (event.target.classList.contains("view-file-list-link")) {

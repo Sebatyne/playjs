@@ -83,6 +83,18 @@ button img {
   flex: 1;
 }
 
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.editor-buffer {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
 .notification-gadget {
   background-color: inherit;
   padding: 0;
@@ -90,8 +102,13 @@ button img {
 
 .CodeMirror {
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
+.CodeMirror-scroll {
+  flex-grow: 1;
+}
 
 @media all and (max-width: 640px) {
   #main {
