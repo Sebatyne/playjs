@@ -5,15 +5,16 @@
     .declareAcquiredMethod("getParameter", "getParameter")
     .declareAcquiredMethod("setParameter", "setParameter")
 
-    .declareMethod("render", function (pathname, value, mode) {
-      var gadget = this;
+    .declareMethod("render", function (pathname, blob) {
+      var gadget = this,
+          fr = new window.FileReader()
 
       gadget.pathname = pathname;
-      gadget.mode = mode;
+      gadget.mode = blob.type;
 
       var editor = CodeMirror.fromTextArea(gadget.element.querySelector('textarea'), {
         lineNumbers: true,
-        mode: mode,
+        mode: gadget.mode,
         autoCloseTags: true,
         matchBrackets: true,
         autoCloseBrackets: true,
@@ -28,9 +29,13 @@
         }
       });
 
-      editor.setValue(value)
-
       gadget.editor = editor;
+
+      fr.onloadend = function (res) {
+        gadget.editor.setValue(res.target.result);
+      }
+
+      fr.readAsText(blob);
 
       return RSVP.Queue();
     })
@@ -38,12 +43,20 @@
     .declareMethod("getValue", function () {
       return this.editor.getValue();
     })
+    .declareMethod("setValue", function (value) {
+      this.editor.setValue(value);
+    })
     .declareMethod("getPathName", function () {
       return this.pathname;
     })
+    .declareMethod("setPathName", function (pathname) {
+      this.pathname = pathname;
+    })
     .declareMethod("getContentType", function () {
       return this.mode;
+    })
+    .declareMethod("setContentType", function (content_type) {
+      this.mode = content_type;
     });
-
 
 }(window, rJS, RSVP));

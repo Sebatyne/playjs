@@ -1,6 +1,15 @@
 (function (window, rJS, RSVP) {
   "use strict";
 
+  function getEditorGadgetFromContentType(content_type) {
+    if (content_type.indexOf("image/") == 0) {
+      return "gadget_image_editor.html";
+    } else {
+      return "gadget_text_editor.html";
+    }
+  }
+
+
   rJS(window)
     .declareMethod("getParameter", function (parameter) {
       var gadget = this;
@@ -148,31 +157,23 @@
           .push(function (blob) {
               content_type_input.value = blob.type;
 
-              var fr = new FileReader();
+              var gadget_element = window.document.createElement("div");
+              gadget_element.setAttribute("name", scopename);
+              gadget_element.classList.add("editor-buffer");
+              gadget.element.querySelector(".editor-container").appendChild(gadget_element);
 
-              fr.onloadend = function (res) {
-                var gadget_element = window.document.createElement("div");
-                gadget_element.setAttribute("name", scopename);
-                gadget_element.classList.add("editor-buffer");
-                gadget.element.querySelector(".editor-container").appendChild(gadget_element);
+              return gadget.declareGadget(getEditorGadgetFromContentType(blob.type), {
+                "scope": scopename,
+                "sandbox": "public",
+                "element": gadget_element,
+              })
+                .push(function (gadget_editor) {
+                  gadget.current_editor_scope = scopename;
+                  gadget.buffer_dict[scopename] = gadget_editor;
+                  gadget_editor.render(pathname, blob)
 
-                gadget.declareGadget("gadget_text_editor.html", {
-                  "scope": scopename,
-                  "sandbox": "public",
-                  "element": gadget_element,
-                })
-                  .push(function (gadget_editor) {
-                    gadget.current_editor_scope = scopename;
-                    gadget.buffer_dict[scopename] = gadget_editor;
-                    gadget_editor.render(pathname, res.target.result, blob.type)
-
-                    return RSVP.Queue();
-                  })
-              }
-
-              fr.readAsText(blob);
-
-              return RSVP.Queue();
+                  return RSVP.Queue();
+                });
           });
       }
 
@@ -272,6 +273,21 @@
         gadget.setParameter("offline", offline)
       ]);
 
-    },false, true);
+    },false, true)
+    .onEvent("change", function (click) {
+      var gadget = this;
+
+      if (event.target.name === "pathname") {
+        return gadget.getDeclaredGadget(gadget.current_editor_scope)
+          .push(function (editor_gadget) {
+            editor_gadget.setPathName(event.target.value);
+          });
+      } else if (event.target.name === "content-type") {
+        return gadget.getDeclaredGadget(gadget.current_editor_scope)
+          .push(function (editor_gadget) {
+            editor_gadget.setContentType(event.target.value);
+          });
+      }
+    }, false, true);
 
 }(window, rJS, RSVP));
