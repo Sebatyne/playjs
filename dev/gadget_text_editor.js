@@ -41,7 +41,7 @@
     })
 
     .declareMethod("getValue", function () {
-      return this.editor.getValue();
+      return new Blob([this.editor.getValue()], {type: this.mode});
     })
     .declareMethod("setValue", function (value) {
       this.editor.setValue(value);

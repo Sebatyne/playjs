@@ -238,8 +238,8 @@
 
               return editor_gadget.getValue()
                 .push(function (editor_content) {
-                  var blob = new Blob([editor_content], {type: content_type});
-                  return storage_gadget.putAttachment(pathname, blob);
+                  // editor_gadget.getValue() always returns a blob
+                  return storage_gadget.putAttachment(pathname, editor_content);
               });
           });
         }
