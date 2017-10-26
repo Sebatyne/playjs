@@ -111,6 +111,7 @@
           scopename = pathname + "_editor",
           pathname_input = gadget.element.querySelector("input[name=\"pathname\"]"),
           content_type_input = gadget.element.querySelector("input[name=\"content-type\"]"),
+          preview_link_tag = gadget.element.querySelector("a[name=\"short-action-open-preview\"]"),
           queue = RSVP.Queue();
 
       // If gadget is the same, do nothing
@@ -119,6 +120,13 @@
       }
 
       pathname_input.value = pathname;
+
+      // Build preview URL of the opened document and set it on link
+      var preview_url = new URL(document.URL);
+      preview_url.pathname = pathname;
+      preview_url.searchParams.set('preview', 'True');
+      preview_link_tag.setAttribute('href', preview_url.href);
+
 
       // Hide previous buffer
       if (gadget.current_editor_scope !== undefined) {
