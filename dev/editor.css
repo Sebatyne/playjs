@@ -23,7 +23,6 @@ button img {
 #page-menu {
   flex: 1 6 20%;
   overflow: auto;
-  padding-left: 1em;
 }
 
 #page-form {
@@ -66,6 +65,10 @@ button img {
   display: flex;
   flex: 1;
   justify-content: space-around;
+}
+
+.pure-menu-list {
+  line-height: 50%;
 }
 
 .view-global-option {
