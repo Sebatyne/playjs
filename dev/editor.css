@@ -103,6 +103,11 @@ button img {
   padding: 0;
 }
 
+.gadget_image_editor {
+  margin: auto;
+  margin-top: 0px;
+}
+
 .CodeMirror {
   flex-grow: 1;
   display: flex;
