@@ -44,8 +44,14 @@
     .declareMethod("getPathName", function () {
       return this.pathname;
     })
+    .declareMethod("setPathName", function (pathname) {
+      this.pathname = pathname;
+    })
     .declareMethod("getContentType", function () {
       return this.mode;
+    })
+    .declareMethod("setContentType", function (content_type) {
+      this.mode = content_type;
     })
     .onEvent("change", function (event) {
       var gadget = this,
