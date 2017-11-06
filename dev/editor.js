@@ -282,7 +282,7 @@
       ]);
 
     },false, true)
-    .onEvent("change", function (click) {
+    .onEvent("change", function (event) {
       var gadget = this;
 
       if (event.target.name === "pathname") {
