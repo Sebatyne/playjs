@@ -161,9 +161,9 @@
             for (var attachment in attachment_object) {
               promise_list.push(gadget.pushAttachment(directory, attachment))
             }
-          });
 
-        return RSVP.all(promise_list);
+            return RSVP.all(promise_list);
+         });
     })
 
     .declareMethod("pushEverything", function () {
