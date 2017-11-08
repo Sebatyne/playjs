@@ -68,7 +68,7 @@ Thanks to web capabilities, PlayJS only needs in order to work :
         </LimitExcept>
 	</Directory>
 
-	<Directory "/var/www/play/dev">
+	<Directory "/var/www/play/priv">
         Dav On
         AuthType Basic
         AuthName "Authentification Required"

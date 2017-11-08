@@ -68,6 +68,7 @@
         "/dev/codemirror/addon/",
         "/dev/codemirror/mode/",
         "/dev/codemirror/theme/",
+        "/priv/",
       ];
 
       return RSVP.Queue();
