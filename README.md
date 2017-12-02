@@ -53,6 +53,8 @@ Thanks to web capabilities, PlayJS only needs in order to work :
     DeflateCompressionLevel 9
     DavLockDB /var/www/play.dav.lock
 
+    AddCharset utf-8 .txt
+
     DocumentRoot /var/www/play
 
 	<Directory "/var/www/play">
