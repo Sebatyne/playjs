@@ -10,7 +10,7 @@
           fr = new window.FileReader()
 
       gadget.pathname = pathname;
-      gadget.mode = blob.type;
+      gadget.mode = blob.type.split(";")[0];
 
       var editor = CodeMirror.fromTextArea(gadget.element.querySelector('textarea'), {
         lineNumbers: true,
