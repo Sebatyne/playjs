@@ -10,6 +10,7 @@
           fr = new window.FileReader()
 
       gadget.pathname = pathname;
+      gadget.blob_type = blob.type;
       gadget.mode = blob.type.split(";")[0];
 
       var editor = CodeMirror.fromTextArea(gadget.element.querySelector('textarea'), {
@@ -41,7 +42,7 @@
     })
 
     .declareMethod("getValue", function () {
-      return new Blob([this.editor.getValue()], {type: this.mode});
+      return new Blob([this.editor.getValue()], {type: this.blob_type});
     })
     .declareMethod("setValue", function (value) {
       this.editor.setValue(value);
@@ -53,10 +54,11 @@
       this.pathname = pathname;
     })
     .declareMethod("getContentType", function () {
-      return this.mode;
+      return this.blob_type;
     })
     .declareMethod("setContentType", function (content_type) {
-      this.mode = content_type;
+      this.blob_type = content_type;
+      this.mode = content_type.split(";")[0];
     });
 
 }(window, rJS, RSVP));
