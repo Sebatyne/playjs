@@ -215,6 +215,32 @@
         return RSVP.Queue();
     })
 
+    .declareMethod("deleteAttachment", function (pathname) {
+        var split = splitDocumentAndAttachmentId(pathname);
+
+        if (split != undefined) {
+          var directory = split[0],
+              attachment = split[1],
+              promise_list = [];
+
+          // When deleting, we want to remove locally and remotely directly
+          return this.local_storage.removeAttachment(directory, attachment)
+            .push(function () {
+              return this.dav_storage.removeAttachment(directory, attachment);
+            })
+            .push(function (success) {
+              return new RSVP.Queue();
+            }, function (error) {
+              // delete remote file can fail for many valid reasons.
+              // ie: a file has been created locally, but never pushed.
+              // thus we just fail silently.
+              console.log('Error when deleting remote file : ' + error);
+              return new RSVP.Queue();
+            });
+        }
+        return RSVP.Queue();
+    })
+
     .declareMethod("getResourceTree", function () {
         var gadget = this,
             global_document_list = [],

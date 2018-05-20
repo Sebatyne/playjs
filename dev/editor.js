@@ -251,6 +251,23 @@
               });
           });
         }
+        else if (event.target.getAttribute('name') == "short-action-delete") {
+          event.preventDefault();
+          var content_type = gadget.element.querySelector("input[name=\"content-type\"]").value,
+              pathname = gadget.element.querySelector("input[name=\"pathname\"]").value;
+
+          if (confirm("Do you really want to delete" + pathname)) {
+            return new RSVP.Queue()
+              .push(function () {
+                return gadget.getDeclaredGadget("storage");
+              })
+              .push(function (storage_gadget) {
+                return storage_gadget.deleteAttachment(pathname);
+              });
+          }
+
+          return new RSVP.Queue();
+        }
         else if (event.target.classList.contains("view-file-list-link")) {
           event.preventDefault();
           var to_hide = gadget.element.querySelector(".view-global-option"),
