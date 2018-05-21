@@ -105,6 +105,9 @@
             return RSVP.Queue();
         });
     })
+    .allowPublicAcquisition("displayResourceList", function () {
+      return this.displayResourceList();
+    })
 
     .declareMethod("openResourceFromPath", function (pathname) {
       var gadget = this,
@@ -254,7 +257,8 @@
         else if (event.target.getAttribute('name') == "short-action-delete") {
           event.preventDefault();
           var content_type = gadget.element.querySelector("input[name=\"content-type\"]").value,
-              pathname = gadget.element.querySelector("input[name=\"pathname\"]").value;
+              pathname = gadget.element.querySelector("input[name=\"pathname\"]").value,
+              gadget = this;
 
           if (confirm("Do you really want to delete" + pathname)) {
             return new RSVP.Queue()
@@ -263,6 +267,9 @@
               })
               .push(function (storage_gadget) {
                 return storage_gadget.deleteAttachment(pathname);
+              })
+              .push(function () {
+                return gadget.displayResourceList();
               });
           }
 

@@ -77,6 +77,7 @@
 
     .declareAcquiredMethod("getParameter", "getParameter")
     .declareAcquiredMethod("setParameter", "setParameter")
+    .declareAcquiredMethod("displayResourceList", "displayResourceList")
 
     .declareMethod("render", function () {
       var gadget = this;
@@ -201,18 +202,45 @@
     })
 
     .declareMethod("putAttachment" , function(pathname, blob) {
-        var split = splitDocumentAndAttachmentId(pathname);
+        var split = splitDocumentAndAttachmentId(pathname),
+            is_new_document = false,
+            gadget = this,
+            queue = new RSVP.Queue();
 
         if (split != undefined) {
             var directory = split[0],
                 attachment = split[1],
                 promise_list = [];
-            return RSVP.all([
-              this.local_storage.put(directory, {}), // should use state, and add only if needed, and add all directories missing in path
-              this.local_storage.putAttachment(directory, attachment, blob)
-            ]);
+            queue
+              .push(function () {
+                console.log('getting attachment');
+                return gadget.local_storage.getAttachment(directory, attachment);
+              })
+              .push(function () {}, function (error) {
+                console.log('couldnt get attachment');
+                console.log(error);
+                is_new_document = true;
+                return new RSVP.Queue();
+              })
+              .push(function () {
+                console.log('put attachment locally');
+                return RSVP.all([
+                  gadget.local_storage.put(directory, {}), // should use state, and add only if needed, and add all directories missing in path
+                  gadget.local_storage.putAttachment(directory, attachment, blob)
+                ]);
+              })
+              .push(function () {
+                if (is_new_document) {
+                  queue.push(function () {
+                    console.log('display resource list');
+                    return gadget.displayResourceList();
+                  });
+                }
+                return new RSVP.Queue();
+              });
         }
-        return RSVP.Queue();
+
+        return queue;
     })
 
     .declareMethod("deleteAttachment", function (pathname) {
