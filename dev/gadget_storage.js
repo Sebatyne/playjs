@@ -244,7 +244,8 @@
     })
 
     .declareMethod("deleteAttachment", function (pathname) {
-        var split = splitDocumentAndAttachmentId(pathname);
+        var split = splitDocumentAndAttachmentId(pathname),
+            gadget = this;
 
         if (split != undefined) {
           var directory = split[0],
@@ -252,9 +253,9 @@
               promise_list = [];
 
           // When deleting, we want to remove locally and remotely directly
-          return this.local_storage.removeAttachment(directory, attachment)
+          return gadget.local_storage.removeAttachment(directory, attachment)
             .push(function () {
-              return this.dav_storage.removeAttachment(directory, attachment);
+              return gadget.dav_storage.removeAttachment(directory, attachment);
             })
             .push(function (success) {
               return new RSVP.Queue();
