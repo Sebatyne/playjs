@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="pure.css">
+    <link rel="stylesheet" href="gadget_editor.css">
+
+    <script type="text/javascript" src="rsvp.js"></script>
+    <script type="text/javascript" src="renderjs.js"></script>
+    <script type="text/javascript" src="gadget_editor.js"></script>
+
+  </head>
+  <body>
+    <div data-gadget-url="gadget_storage.html"
+         data-gadget-scope="storage"
+         data-gadget-sandbox="public"></div>
+
+    <div data-gadget-url="gadget_setting.html"
+     data-gadget-scope="setting"
+     data-gadget-sandbox="public"></div>
+
+    <div id='main'> 
+      <div id="page-menu">
+        
+        <div class="pure-menu pure-menu-horizontal">
+          <ul class="pure-menu-list">
+            <li class="pure-menu-item"><a href="#" class="pure-menu-link view-file-list-link">Files</a></li>
+            <li class="pure-menu-item"><a href="#" class="pure-menu-link view-global-option-link">Options</a></li>
+          </ul>
+        </div>
+        
+        <nav class="view-file-list">
+          <ul id="edit-page-list" class="edit-page-list pure-menu-list"></ul>
+        </nav>
+
+        <form class="view-global-option pure-form pure-form-stacked">
+          <fieldset>
+            <label for="username">Username</label>
+            <input type="text" name="username">
+
+            <label for="password">Password</label>
+            <input type="password" name="password">
+          </fieldset>
+
+          <fieldset>
+            <label for="development-mode" class="pure-checkbox">
+              <input name="development-mode" type="checkbox">
+              Development mode (serve local pages)
+            </label>
+          </fieldset>
+
+          <button type="submit" class="pure-button pure-button-primary">Save</button>
+
+        </form>
+      </div>
+
+      <form id="page-form" class="pure-form main-form-visible">
+        <div id="page-form-head">
+          <fieldset id="page-form-metadata">
+            <input type="text" name="pathname" placeholder="Path" />
+            <input type="text" name="content-type" placeholder="Content-Type" />
+            <span>
+              <a href="#" name="short-action-open-preview" target="_blank"><img class="image-open-preview" src="/dev/external-link.svg" /></a>
+            </span>
+          </fieldset>
+
+          <fieldset id="page-form-short-action">
+            <div data-gadget-url="gadget_notification.html"
+                 data-gadget-scope="notification"
+                 data-gadget-sandbox="public"
+                 class="pure-button notification-gadget"></div>
+            <button name="short-action-pull-all" class="pure-button"><img src="/dev/download-cloud.svg" /></button>
+            <button name="short-action-push-all" class="pure-button"><img src="/dev/upload-cloud.svg" /></button>
+            <button name="short-action-delete" class="pure-button"><img src="/dev/delete.svg"/></button>
+            <button name="short-action-save" class="pure-button" accesskey="s"><img src="/dev/save.svg"/></button>
+          </fieldset>
+        </div>
+
+        <div class="editor-container"></div>
+      </form>
+    </div>
+
+  </body>
+</html>
