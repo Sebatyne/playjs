@@ -83,6 +83,12 @@
         })
         .push(function () {
           return gadget.displayResourceList();
+        })
+        .push(function () {
+          return gadget.getDeclaredGadget("router");
+        })
+        .push(function (router_gadget) {
+          return router_gadget.applyActionFromURL();
         });
     })
 
@@ -97,7 +103,7 @@
 
             for (var resource in resource_tree) {
               for (var i=0; i<resource_tree[resource].length; i++) {
-                web_page_edit_list += "<li class=\"pure-menu-item\"><a href=\"#\" class=\"edit-page-link pure-menu-link\">" + resource + resource_tree[resource][i] + "</a></li>";
+                web_page_edit_list += "<li class=\"pure-menu-item\"><a href=\"#action=edit&path=" + resource + resource_tree[resource][i] + "\" class=\"edit-page-link pure-menu-link\">" + resource + resource_tree[resource][i] + "</a></li>";
               }
             }
             document.getElementById('edit-page-list').innerHTML = web_page_edit_list;
@@ -190,6 +196,9 @@
 
       return queue;
     })
+    .allowPublicAcquisition("openResourceFromPath", function (parameter_list) {
+      return this.openResourceFromPath(parameter_list[0]);
+    })
 
     .declareService(function () {
       return this.render();
@@ -198,11 +207,7 @@
         var gadget = this,
             queue = new RSVP.Queue();
 
-        if (event.target.classList.contains("edit-page-link")) {
-          document.title = event.target.text;
-          return gadget.openResourceFromPath(event.target.text);
-        }
-        else if (event.target.getAttribute('name') == "short-action-pull-all") {
+        if (event.target.getAttribute('name') == "short-action-pull-all") {
           event.preventDefault();
           return gadget.startLongActionNotification()
             .push(function () {
