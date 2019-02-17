@@ -130,6 +130,9 @@
 
       pathname_input.value = pathname;
 
+      // Update Page Title
+      document.title = pathname;
+
       // Build preview URL of the opened document and set it on link
       var preview_url = new URL(document.URL);
       preview_url.pathname = pathname;
