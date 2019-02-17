@@ -133,6 +133,7 @@
       // Build preview URL of the opened document and set it on link
       var preview_url = new URL(document.URL);
       preview_url.pathname = pathname;
+      preview_url.hash = "";
       preview_url.searchParams.set('preview', 'True');
       preview_link_tag.setAttribute('href', preview_url.href);
 
