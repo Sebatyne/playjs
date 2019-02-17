@@ -58,42 +58,51 @@ self.addEventListener('fetch', function(event) {
       is_preview = is_preview || referrer_url.searchParams.get("preview");
   }
   
-  event.respondWith(new self.RSVP.Queue()
-    .push(function () {
-      return isOfflineMode();
-    })
-    .push(function (offline) {
-      var queue = new self.RSVP.Queue();
+  if (pathname.endsWith("/edit")) {
+    console.log('Nicolas: ', pathname);
+    let offset_length = "/edit".length,
+        real_pathname = pathname.substring(0, pathname.length - offset_length);
 
-      if ((offline.value || is_preview) && orig_request.method === "GET") {
-        if (pathname[pathname.length - 1] === "/") {
-          pathname = pathname + "index.html";
+    pathname = "/dev/";
+    hash = "#action=edit&path=" + real_pathname;
+    event.respondWith(Response.redirect(window.location.origin + pathname + hash));
+  } else {
+    event.respondWith(new self.RSVP.Queue()
+      .push(function () {
+        return isOfflineMode();
+      })
+      .push(function (offline) {
+        var queue = new self.RSVP.Queue();
+
+        if ((offline.value || is_preview) && orig_request.method === "GET") {
+          if (pathname[pathname.length - 1] === "/") {
+            pathname = pathname + "index.html";
+          }
+
+          var split = splitDocumentAndAttachmentId(pathname);
+
+          if (split != undefined) {
+              var directory = split[0],
+                  attachment = split[1];
+          }
+
+          queue
+            .push(function () {
+              storage = createStorage();
+              return storage.getAttachment(directory, attachment);
+            })
+            .push(function (blob) {
+              return new Response(blob, {headers: {'content-type': blob.type}});
+            });
+        } else {
+          queue
+            .push(function () {
+              return fetch(event.request);
+            });
         }
 
-        var split = splitDocumentAndAttachmentId(pathname);
-
-        if (split != undefined) {
-            var directory = split[0],
-                attachment = split[1];
-        }
-
-        queue
-          .push(function () {
-            storage = createStorage();
-            return storage.getAttachment(directory, attachment);
-          })
-          .push(function (blob) {
-            return new Response(blob, {headers: {'content-type': blob.type}});
-          });
-      } else {
-        queue
-          .push(function () {
-            return fetch(event.request);
-          });
-      }
-    
-      return queue;
-    })
-  );
-  console.log('Fetching over');
+        return queue;
+      })
+    );
+  }
 });
